@@ -1,5 +1,8 @@
-FROM node:20-alpine
+FROM node:20-slim
 WORKDIR /app
+
+# OpenSSL requerido por Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm install --omit=dev
@@ -10,4 +13,5 @@ RUN npx prisma generate
 COPY src ./src
 
 EXPOSE 3000
-CMD ["npm", "start"]
+# Corre migraciones automáticamente en cada deploy, luego arranca el servidor
+CMD ["sh", "-c", "npx prisma migrate deploy && node src/app.js"]
