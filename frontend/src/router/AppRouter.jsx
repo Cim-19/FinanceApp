@@ -1,0 +1,67 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
+
+import LandingPage        from '../pages/LandingPage';
+import LoginPage          from '../pages/auth/LoginPage';
+import RegisterPage       from '../pages/auth/RegisterPage';
+import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
+import ResetPasswordPage  from '../pages/auth/ResetPasswordPage';
+
+import AppLayout          from '../components/layout/AppLayout';
+import DashboardPage      from '../pages/DashboardPage';
+import AccountsPage       from '../pages/AccountsPage';
+import TransactionsPage   from '../pages/TransactionsPage';
+import BudgetsPage        from '../pages/BudgetsPage';
+import CategoriesPage     from '../pages/CategoriesPage';
+import ReportsPage        from '../pages/ReportsPage';
+import SettingsPage       from '../pages/SettingsPage';
+import AdminDashboard     from '../pages/admin/AdminDashboard';
+import AdminUsersPage     from '../pages/admin/AdminUsersPage';
+import AdminConfigPage    from '../pages/admin/AdminConfigPage';
+import FamilyPage         from '../pages/FamilyPage';
+import JoinFamilyPage     from '../pages/JoinFamilyPage';
+
+const ProtectedRoute = ({ children }) => {
+  const token = useAuthStore((s) => s.accessToken);
+  return token ? children : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }) => {
+  const token = useAuthStore((s) => s.accessToken);
+  return !token ? children : <Navigate to="/dashboard" replace />;
+};
+
+export default function AppRouter() {
+  return (
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Routes>
+        {/* Landing — accesible para todos */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Rutas públicas (redirigen al dashboard si ya hay sesión) */}
+        <Route path="/login"           element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/register"        element={<PublicRoute><RegisterPage /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
+        <Route path="/reset-password"  element={<PublicRoute><ResetPasswordPage  /></PublicRoute>} />
+
+        {/* Rutas protegidas */}
+        <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+          <Route path="/dashboard"    element={<DashboardPage />} />
+          <Route path="/accounts"     element={<AccountsPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/budgets"      element={<BudgetsPage />} />
+          <Route path="/categories"   element={<CategoriesPage />} />
+          <Route path="/reports"      element={<ReportsPage />} />
+          <Route path="/settings"     element={<SettingsPage />} />
+          <Route path="/family"           element={<FamilyPage />} />
+          <Route path="/family/join/:token" element={<JoinFamilyPage />} />
+          <Route path="/admin"         element={<AdminDashboard />} />
+          <Route path="/admin/users"  element={<AdminUsersPage />} />
+          <Route path="/admin/config" element={<AdminConfigPage />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
