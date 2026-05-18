@@ -35,8 +35,8 @@ export default function AppRouter() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
-        {/* Landing — accesible para todos */}
-        <Route path="/" element={<LandingPage />} />
+        {/* Landing — redirige al dashboard si ya hay sesión */}
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
 
         {/* Rutas públicas (redirigen al dashboard si ya hay sesión) */}
         <Route path="/login"           element={<PublicRoute><LoginPage /></PublicRoute>} />
