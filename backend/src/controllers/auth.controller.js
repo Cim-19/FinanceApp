@@ -13,11 +13,13 @@ const generateTokens = (user) => {
   return { accessToken, refreshToken };
 };
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const setRefreshCookie = (res, token) => {
   res.cookie('refreshToken', token, {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure:   isProd,
+    sameSite: isProd ? 'none' : 'strict',
     maxAge:   7 * 24 * 60 * 60 * 1000,
   });
 };
@@ -110,7 +112,7 @@ exports.refresh = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  res.clearCookie('refreshToken');
+  res.clearCookie('refreshToken', { httpOnly: true, secure: isProd, sameSite: isProd ? 'none' : 'strict' });
   res.json({ success: true, message: 'Sesión cerrada correctamente' });
 };
 

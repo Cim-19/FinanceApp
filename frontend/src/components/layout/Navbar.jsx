@@ -55,16 +55,16 @@ export default function Navbar() {
           {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
         </button>
 
-        {/* Avatar + logout (desktop) */}
-        <div className="hidden lg:flex items-center gap-2 ml-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center cursor-pointer" title={user?.name}>
-            <span className="text-white text-sm font-bold">{initials}</span>
-          </div>
-          <button onClick={handleLogout}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition" title="Cerrar sesión">
-            <LogOut className="w-5 h-5" />
-          </button>
+        {/* Avatar */}
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center cursor-pointer ml-1" title={user?.name}>
+          <span className="text-white text-sm font-bold">{initials}</span>
         </div>
+
+        {/* Logout — visible en todos los tamaños */}
+        <button onClick={handleLogout}
+          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition" title="Cerrar sesión">
+          <LogOut className="w-5 h-5" />
+        </button>
       </div>
     </header>
   );
