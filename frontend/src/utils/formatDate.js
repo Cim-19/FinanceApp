@@ -1,6 +1,8 @@
-// Parsea strings de fecha (ISO o "YYYY-MM-DD") como fecha LOCAL, no UTC.
-// new Date("2026-05-19") crea medianoche UTC → en Lima (UTC-5) sería el día anterior.
-// new Date(2026, 4, 19) crea medianoche local → siempre el día correcto.
+const TZ = 'America/Lima';
+
+// Para campos date-only (tx.date): "2026-05-19T00:00:00.000Z"
+// new Date() los interpreta como UTC → en Lima sería el día anterior.
+// Solución: extraer la parte YYYY-MM-DD y crear fecha local.
 const parseLocal = (date) => {
   if (!date) return new Date();
   const str = typeof date === 'string' ? date.split('T')[0] : date.toISOString().split('T')[0];
@@ -8,6 +10,7 @@ const parseLocal = (date) => {
   return new Date(y, m - 1, d);
 };
 
+// Formatea campos date-only (fecha de transacción, presupuesto, etc.)
 export const formatDate = (date, opts = {}) =>
   new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric', ...opts })
     .format(parseLocal(date));
@@ -23,7 +26,22 @@ export const toInputDate = (date) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
-// Fecha de hoy en zona local (para usar como valor por defecto en formularios)
+// Formatea timestamps completos (createdAt, updatedAt) en zona Lima
+// Convierte UTC → America/Lima independientemente del timezone del dispositivo
+export const formatDateTime = (date) =>
+  new Intl.DateTimeFormat('es-PE', {
+    timeZone: TZ,
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true,
+  }).format(new Date(date));
+
+export const formatDateTimeLima = (date) =>
+  new Intl.DateTimeFormat('es-PE', {
+    timeZone: TZ,
+    day: '2-digit', month: 'long', year: 'numeric',
+  }).format(new Date(date));
+
+// Fecha de hoy en zona Lima (para valores por defecto en formularios)
 export const localToday = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;

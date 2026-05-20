@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, ChevronLeft, ChevronRight, Shield, ShieldOff, Star, UserX, UserCheck, X } from 'lucide-react';
 import { getAdminUsers, getAdminUser, updateUserPlan, toggleUserActive, updateUserRole } from '../../api/admin';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { formatDateTimeLima } from '../../utils/formatDate';
 
 const PLAN_BADGE = {
   FREE:   'bg-gray-100   dark:bg-gray-800   text-gray-600   dark:text-gray-300',
@@ -116,7 +117,7 @@ function UserDetailModal({ userId, onClose, onRefresh }) {
 
               {/* Info */}
               <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-                <p>📅 Miembro desde: <span className="font-medium text-gray-700 dark:text-gray-200">{new Date(user.createdAt).toLocaleDateString('es-PE', { dateStyle: 'long' })}</span></p>
+                <p>📅 Miembro desde: <span className="font-medium text-gray-700 dark:text-gray-200">{formatDateTimeLima(user.createdAt)}</span></p>
                 <p>💱 Moneda: <span className="font-medium text-gray-700 dark:text-gray-200">{user.currency}</span></p>
               </div>
 
@@ -297,7 +298,7 @@ export default function AdminUsersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-400">
-                    {new Date(u.createdAt).toLocaleDateString('es-PE')}
+                    {formatDateTimeLima(u.createdAt)}
                   </td>
                 </tr>
               ))}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, Lock, Star, Upload, CheckCircle, AlertCircle, Eye, EyeOff, Zap } from 'lucide-react';
 import { getProfile, updateProfile, changePassword, importCsv } from '../api/users';
+import { formatDateTimeLima } from '../utils/formatDate';
 import { getPublicConfig } from '../api/config';
 import { createCharge }    from '../api/payments';
 import useAuthStore from '../store/authStore';
@@ -107,7 +108,7 @@ function ProfileSection({ profile }) {
           <p className="font-bold text-gray-800 dark:text-white text-lg">{name || '—'}</p>
           <p className="text-sm text-gray-400">{profile?.email}</p>
           <p className="text-xs text-gray-300 dark:text-gray-600 mt-0.5">
-            Miembro desde {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('es-PE', { year: 'numeric', month: 'long' }) : '—'}
+            Miembro desde {profile?.createdAt ? formatDateTimeLima(profile.createdAt) : '—'}
           </p>
         </div>
       </div>
