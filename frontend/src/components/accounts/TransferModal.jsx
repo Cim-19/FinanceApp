@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { ACCOUNT_TYPES, iconEmoji } from '../../utils/accountTypes';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { localToday } from '../../utils/formatDate';
 
 export default function TransferModal({ open, onClose, onSave, accounts, defaultFrom }) {
-  const [form,    setForm   ] = useState({ fromAccountId: defaultFrom?.id || '', toAccountId: '', amount: '', description: '', date: new Date().toISOString().split('T')[0] });
+  const [form,    setForm   ] = useState({ fromAccountId: defaultFrom?.id || '', toAccountId: '', amount: '', description: '', date: localToday() });
   const [loading, setLoading] = useState(false);
   const [error,   setError  ] = useState('');
 

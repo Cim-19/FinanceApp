@@ -11,6 +11,7 @@ import {
 } from '../api/reports';
 import MonthSelector   from '../components/dashboard/MonthSelector';
 import { formatCurrency } from '../utils/formatCurrency';
+import { localToday }     from '../utils/formatDate';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -27,9 +28,9 @@ const fmtEvLabel = (label) => {
   return `${MONTH_SHORT[parseInt(m) - 1]} '${y.slice(2)}`;
 };
 
-const todayISO  = () => new Date().toISOString().split('T')[0];
 const firstOfMonthISO = () => {
-  const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
 };
 
 // ── Reusable mini-components ──────────────────────────────────────────────────
@@ -301,7 +302,7 @@ function TabAnnual() {
 
 function TabByCategory() {
   const [desde,   setDesde  ] = useState(firstOfMonthISO());
-  const [hasta,   setHasta  ] = useState(todayISO());
+  const [hasta,   setHasta  ] = useState(localToday());
   const [type,    setType   ] = useState('EGRESO');
   const [data,    setData   ] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -341,7 +342,7 @@ function TabByCategory() {
           <div>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Hasta</label>
             <input type="date" className="input-base text-sm" value={hasta}
-              onChange={(e) => setHasta(e.target.value)} min={desde} max={todayISO()} />
+              onChange={(e) => setHasta(e.target.value)} min={desde} max={localToday()} />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo</label>
@@ -464,7 +465,7 @@ export default function ReportsPage() {
   const [pdfLoading,  setPdfLoading ] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [exportDesde, setExportDesde] = useState(firstOfMonthISO());
-  const [exportHasta, setExportHasta] = useState(todayISO());
+  const [exportHasta, setExportHasta] = useState(localToday());
 
   const handleExport = async () => {
     setCsvLoading(true);

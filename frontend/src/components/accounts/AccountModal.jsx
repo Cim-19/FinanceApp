@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
 import { ACCOUNT_TYPES, ACCOUNT_ICONS, ACCOUNT_COLORS } from '../../utils/accountTypes';
+import { localToday } from '../../utils/formatDate';
 
 const TYPES = Object.entries(ACCOUNT_TYPES).map(([value, meta]) => ({
   value, label: meta.label, emoji: meta.emoji, gradient: meta.gradient,
@@ -188,7 +189,7 @@ export default function AccountModal({ open, onClose, onSave, initial }) {
                 <label className="block text-xs text-emerald-600 dark:text-emerald-400 mb-1">Fecha límite</label>
                 <input type="date" value={form.savingGoal.deadline}
                   onChange={(e) => setGoal('deadline', e.target.value)}
-                  className="input-base" min={new Date().toISOString().split('T')[0]} />
+                  className="input-base" min={localToday()} />
               </div>
             </div>
           )}

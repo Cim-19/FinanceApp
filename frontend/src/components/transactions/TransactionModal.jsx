@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, TrendingUp, TrendingDown, Tag, RefreshCw, ChevronDown } from 'lucide-react';
 import { iconEmoji } from '../../utils/accountTypes';
+import { localToday } from '../../utils/formatDate';
 
 const FREQUENCIES = [
   { value: 'DAILY',   label: 'Diario'   },
@@ -11,7 +12,7 @@ const FREQUENCIES = [
 
 const empty = {
   type: 'EGRESO', accountId: '', categoryId: '', amount: '',
-  description: '', date: new Date().toISOString().split('T')[0],
+  description: '', date: localToday(),
   tags: '', isRecurring: false,
   recurringRule: { frequency: 'MONTHLY', nextDate: '', endDate: '' },
 };
@@ -39,7 +40,7 @@ export default function TransactionModal({ open, onClose, onSave, initial, accou
           recurringRule: { frequency: 'MONTHLY', nextDate: '', endDate: '' },
         });
       } else {
-        setForm({ ...empty, date: new Date().toISOString().split('T')[0] });
+        setForm({ ...empty, date: localToday() });
       }
     }
   }, [open, initial]);
