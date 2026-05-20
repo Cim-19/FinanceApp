@@ -41,8 +41,7 @@ export const formatDateTimeLima = (date) =>
     day: '2-digit', month: 'long', year: 'numeric',
   }).format(new Date(date));
 
-// Fecha de hoy en zona Lima (para valores por defecto en formularios)
-export const localToday = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
+// Fecha de hoy en zona Lima — independiente del timezone del dispositivo
+// en-CA usa formato YYYY-MM-DD nativamente
+export const localToday = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { ACCOUNT_TYPES, iconEmoji } from '../../utils/accountTypes';
 import { formatCurrency } from '../../utils/formatCurrency';
@@ -8,6 +8,14 @@ export default function TransferModal({ open, onClose, onSave, accounts, default
   const [form,    setForm   ] = useState({ fromAccountId: defaultFrom?.id || '', toAccountId: '', amount: '', description: '', date: localToday() });
   const [loading, setLoading] = useState(false);
   const [error,   setError  ] = useState('');
+
+  // Resetea el formulario y actualiza la fecha cada vez que se abre el modal
+  useEffect(() => {
+    if (open) {
+      setError('');
+      setForm({ fromAccountId: defaultFrom?.id || '', toAccountId: '', amount: '', description: '', date: localToday() });
+    }
+  }, [open, defaultFrom]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
