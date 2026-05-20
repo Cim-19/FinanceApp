@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, Lock, Star, Upload, CheckCircle, AlertCircle, Eye, EyeOff, Zap } from 'lucide-react';
 import { getProfile, updateProfile, changePassword, importCsv } from '../api/users';
 import { formatDateTimeLima } from '../utils/formatDate';
+import { usePushNotifications } from '../hooks/usePushNotifications';
+import { Bell, BellOff } from 'lucide-react';
 import { getPublicConfig } from '../api/config';
 import { createCharge }    from '../api/payments';
 import useAuthStore from '../store/authStore';
@@ -559,6 +561,48 @@ function ImportSection() {
   );
 }
 
+// ── Notifications section ─────────────────────────────────────────────────────
+
+function NotificationsSection() {
+  const { supported, permission, subscribed, loading, subscribe, unsubscribe } = usePushNotifications();
+
+  if (!supported) return null;
+
+  return (
+    <Section title="🔔 Notificaciones push">
+      <div className="flex items-start gap-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${subscribed ? 'bg-violet-100 dark:bg-violet-900/30' : 'bg-gray-100 dark:bg-gray-800'}`}>
+          {subscribed
+            ? <Bell className="w-6 h-6 text-violet-600" />
+            : <BellOff className="w-6 h-6 text-gray-400" />}
+        </div>
+        <div className="flex-1">
+          <p className="font-semibold text-gray-800 dark:text-white text-sm">
+            {subscribed ? 'Notificaciones activadas' : 'Activa las notificaciones'}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            {subscribed
+              ? 'Recibirás recordatorios de gastos (9 PM L-V) y tips de ahorro (lunes 8 AM).'
+              : 'Recibe recordatorios para registrar tus gastos y tips de ahorro semanales.'}
+          </p>
+          {permission === 'denied' && (
+            <p className="text-xs text-rose-500 mt-1">⚠️ Permiso denegado en el navegador. Actívalo en Configuración del sistema.</p>
+          )}
+        </div>
+        <button
+          onClick={subscribed ? unsubscribe : subscribe}
+          disabled={loading || permission === 'denied'}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50 flex-shrink-0
+            ${subscribed
+              ? 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-red-50 hover:text-red-600'
+              : 'bg-gradient-to-r from-violet-600 to-purple-700 text-white hover:from-violet-700 hover:to-purple-800'}`}>
+          {loading ? '...' : subscribed ? 'Desactivar' : 'Activar'}
+        </button>
+      </div>
+    </Section>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -580,6 +624,7 @@ export default function SettingsPage() {
       <ProfileSection      profile={profile} />
       <PasswordSection />
       <SubscriptionSection profile={profile} onPlanChange={fetchProfile} />
+      <NotificationsSection />
       <ImportSection />
     </div>
   );

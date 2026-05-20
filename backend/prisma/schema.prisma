@@ -99,14 +99,28 @@ model User {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  accounts      Account[]
-  categories    Category[]
-  transactions  Transaction[]
-  budgets       Budget[]
-  subscription  Subscription?
-  notifications Notification[]
-  familyMember  FamilyMember?
-  ownedFamily   Family?
+  accounts          Account[]
+  categories        Category[]
+  transactions      Transaction[]
+  budgets           Budget[]
+  subscription      Subscription?
+  notifications     Notification[]
+  familyMember      FamilyMember?
+  ownedFamily       Family?
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Account {

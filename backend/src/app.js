@@ -24,8 +24,10 @@ const paymentsRoutes     = require('./routes/payments.routes');
 const notificationsRoutes = require('./routes/notifications.routes');
 const searchRoutes        = require('./routes/search.routes');
 const familyRoutes        = require('./routes/family.routes');
-const { startRecurringJob } = require('./services/recurring.service');
+const pushRoutes          = require('./routes/push.routes');
+const { startRecurringJob }  = require('./services/recurring.service');
 const { startSubscriptionJob } = require('./services/subscription.service');
+const { startPushCrons }     = require('./services/push.cron');
 
 const app = express();
 
@@ -60,6 +62,7 @@ app.use('/api/payments',       paymentsRoutes);
 app.use('/api/notifications',  notificationsRoutes);
 app.use('/api/search',         searchRoutes);
 app.use('/api/family',         familyRoutes);
+app.use('/api/push',           pushRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -75,6 +78,7 @@ app.listen(PORT, () => {
   console.log(`📡  API: http://localhost:${PORT}/api`);
   startRecurringJob();
   startSubscriptionJob();
+  startPushCrons();
 });
 
 module.exports = app;
