@@ -21,7 +21,6 @@ export default defineConfig({
       srcDir:       'src',
       filename:     'sw.js',
       registerType: 'prompt',
-      injectRegister: false,
       includeAssets: ['icons/*.png', 'icons/*.svg', 'icons/icon.svg'],
       manifest: {
         name: 'FinanceApp — Finanzas Personales',
