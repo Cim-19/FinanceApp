@@ -195,6 +195,55 @@ exports.balanceEvolution = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+exports.daily = async (req, res, next) => {
+  try {
+    const now   = new Date();
+    const month = req.query.month ? Number(req.query.month) : now.getMonth() + 1;
+    const year  = req.query.year  ? Number(req.query.year)  : now.getFullYear();
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    const [incRows, expRows] = await Promise.all([
+      prisma.transaction.groupBy({
+        by:    ['date'],
+        where: baseWhere(req.user.id, {
+          type: 'INGRESO',
+          date: { gte: new Date(year, month - 1, 1), lte: new Date(year, month - 1, daysInMonth, 23, 59, 59) },
+        }),
+        _sum: { amount: true },
+      }),
+      prisma.transaction.groupBy({
+        by:    ['date'],
+        where: baseWhere(req.user.id, {
+          type: 'EGRESO',
+          date: { gte: new Date(year, month - 1, 1), lte: new Date(year, month - 1, daysInMonth, 23, 59, 59) },
+        }),
+        _sum: { amount: true },
+      }),
+    ]);
+
+    const toDay = (d) => new Date(d).getDate();
+
+    const incMap = {};
+    for (const r of incRows) {
+      const day = toDay(r.date);
+      incMap[day] = (incMap[day] || 0) + Number(r._sum.amount || 0);
+    }
+    const expMap = {};
+    for (const r of expRows) {
+      const day = toDay(r.date);
+      expMap[day] = (expMap[day] || 0) + Number(r._sum.amount || 0);
+    }
+
+    const result = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      result.push({ day: d, income: incMap[d] || 0, expense: expMap[d] || 0 });
+    }
+
+    res.json({ success: true, data: result });
+  } catch (err) { next(err); }
+};
+
 exports.exportCsv = async (req, res, next) => {
   try {
     const { desde, hasta } = req.query;

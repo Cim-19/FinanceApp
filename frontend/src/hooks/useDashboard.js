@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getMonthlyReport, getByCategoryReport, getBalanceEvolution, getWeeklyReport } from '../api/reports';
+import { getMonthlyReport, getByCategoryReport, getBalanceEvolution, getWeeklyReport, getDailyReport } from '../api/reports';
 import { getTransactions } from '../api/transactions';
 import { getAccounts }     from '../api/accounts';
 import { listRecurring }   from '../api/recurring';
@@ -13,7 +13,7 @@ export default function useDashboard(month, year) {
     setLoading(true);
     setError('');
     try {
-      const [monthly, byCategory, evolution, recent, accounts, weekly, recurring] = await Promise.all([
+      const [monthly, byCategory, evolution, recent, accounts, weekly, recurring, daily] = await Promise.all([
         getMonthlyReport({ month, year }),
         getByCategoryReport({ type: 'EGRESO', desde: `${year}-${String(month).padStart(2,'0')}-01`, hasta: `${year}-${String(month).padStart(2,'0')}-31` }),
         getBalanceEvolution({ months: 6 }),
@@ -21,6 +21,7 @@ export default function useDashboard(month, year) {
         getAccounts(),
         getWeeklyReport({ month, year }),
         listRecurring(),
+        getDailyReport({ month, year }),
       ]);
 
       setData({
@@ -31,6 +32,7 @@ export default function useDashboard(month, year) {
         accounts:   accounts.data.data,
         weekly:     weekly.data.data,
         recurring:  recurring.data.data,
+        daily:      daily.data.data,
       });
     } catch (err) {
       setError(err.response?.data?.error || 'Error al cargar el dashboard');

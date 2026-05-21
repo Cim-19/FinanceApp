@@ -12,6 +12,7 @@ import IncomeExpenseBar    from '../components/charts/IncomeExpenseBar';
 import WeeklyFlowChart     from '../components/charts/WeeklyFlowChart';
 import ExpensePie          from '../components/charts/ExpensePie';
 import BalanceLine         from '../components/charts/BalanceLine';
+import DailyFlowChart      from '../components/charts/DailyFlowChart';
 import { formatCurrency }  from '../utils/formatCurrency';
 
 export default function DashboardPage() {
@@ -102,6 +103,11 @@ export default function DashboardPage() {
           )}
           <ExpensePie data={data?.byCategory ?? []} />
         </div>
+      )}
+
+      {/* Flujo diario — full width */}
+      {loading ? <ChartSkeleton /> : (
+        <DailyFlowChart data={data?.daily ?? []} month={month} year={year} />
       )}
 
       {/* Gráfica evolución — full width */}

@@ -6,6 +6,7 @@ const planGuard = require('../middlewares/planGuard');
 router.use(authJWT);
 
 router.get('/monthly',           ctrl.monthly);
+router.get('/daily',             ctrl.daily);
 router.get('/weekly',            ctrl.weekly);
 router.get('/by-category',       ctrl.byCategory);
 router.get('/balance-evolution', ctrl.balanceEvolution);
