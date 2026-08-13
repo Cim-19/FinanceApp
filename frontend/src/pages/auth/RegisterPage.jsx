@@ -48,35 +48,35 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-dvh bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 flex items-center justify-center p-4 py-4 sm:py-6 relative overflow-x-hidden">
 
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-violet-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse-slow" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse-slow" />
 
-      <div className="relative w-full max-w-md animate-fade-in">
+      <div className="relative w-full max-w-md animate-fade-in my-auto">
 
         {/* Marca */}
-        <div className="text-center mb-7">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/95 rounded-3xl shadow-float mb-4">
-            <span className="text-5xl">🚀</span>
+        <div className="text-center mb-3 sm:mb-7">
+          <div className="inline-flex items-center justify-center w-11 h-11 sm:w-20 sm:h-20 bg-white/95 rounded-2xl sm:rounded-3xl shadow-float mb-1.5 sm:mb-4">
+            <span className="text-2xl sm:text-5xl">🚀</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">Crea tu cuenta</h1>
-          <p className="text-emerald-100 mt-1 text-sm">¡Es gratis para siempre! 🎉</p>
+          <h1 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight">Crea tu cuenta</h1>
+          <p className="text-emerald-100 mt-0.5 sm:mt-1 text-xs sm:text-sm">¡Es gratis para siempre! 🎉</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-slide-up">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Tus datos</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-4 sm:p-8 animate-slide-up">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-3 sm:mb-6">Tus datos</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center gap-2">
+            <div className="mb-3 sm:mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center gap-2">
               <span>⚠️</span> {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-4">
             {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombre completo</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-1.5">Nombre completo</label>
               <div className="relative">
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="text" name="name" value={form.name} onChange={handleChange}
@@ -86,7 +86,7 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Correo electrónico</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-1.5">Correo electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="email" name="email" value={form.email} onChange={handleChange}
@@ -96,7 +96,7 @@ export default function RegisterPage() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-1.5">Contraseña</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type={showPwd ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange}
@@ -108,7 +108,7 @@ export default function RegisterPage() {
               </div>
               {/* Strength bar */}
               {form.password && (
-                <div className="mt-2 space-y-1">
+                <div className="mt-1.5 space-y-0.5">
                   <div className="flex gap-1">
                     {[1,2,3,4].map((i) => (
                       <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i <= strength ? STRENGTH_COLORS[strength] : 'bg-gray-200'}`} />
@@ -121,7 +121,7 @@ export default function RegisterPage() {
 
             {/* Confirm */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Confirmar contraseña</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-1.5">Confirmar contraseña</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input type="password" name="confirm" value={form.confirm} onChange={handleChange}
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-6 text-sm">
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-4 sm:mt-6 text-sm">
             ¿Ya tienes cuenta?{' '}
             <Link to="/login" className="text-emerald-600 font-semibold hover:underline">Iniciar sesión</Link>
           </p>
