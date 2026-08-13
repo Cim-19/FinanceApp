@@ -31,6 +31,17 @@ const PublicRoute = ({ children }) => {
   return !token ? children : <Navigate to="/dashboard" replace />;
 };
 
+// El backend ya rechaza estos endpoints para no-admins; este guard evita que
+// la UI de admin siquiera se renderice (y dispare sus llamadas a la API) para
+// cualquier otro usuario autenticado.
+const AdminRoute = ({ children }) => {
+  const token = useAuthStore((s) => s.accessToken);
+  const role  = useAuthStore((s) => s.user?.role);
+  if (!token) return <Navigate to="/login" replace />;
+  if (role !== 'ADMIN') return <Navigate to="/dashboard" replace />;
+  return children;
+};
+
 export default function AppRouter() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -55,9 +66,9 @@ export default function AppRouter() {
           <Route path="/settings"     element={<SettingsPage />} />
           <Route path="/family"           element={<FamilyPage />} />
           <Route path="/family/join/:token" element={<JoinFamilyPage />} />
-          <Route path="/admin"         element={<AdminDashboard />} />
-          <Route path="/admin/users"  element={<AdminUsersPage />} />
-          <Route path="/admin/config" element={<AdminConfigPage />} />
+          <Route path="/admin"         element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/users"  element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+          <Route path="/admin/config" element={<AdminRoute><AdminConfigPage /></AdminRoute>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

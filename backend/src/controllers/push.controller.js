@@ -12,6 +12,9 @@ exports.subscribe = async (req, res) => {
     return res.status(400).json({ success: false, error: 'Datos de suscripción incompletos' });
   }
 
+  // El endpoint identifica al navegador/dispositivo, no a la cuenta — reasignarlo
+  // al usuario que se suscribe es intencional (ej. dispositivo compartido: solo
+  // quien inició sesión más recientemente debe recibir push en ese canal).
   await prisma.pushSubscription.upsert({
     where:  { endpoint },
     update: { userId, p256dh, auth },

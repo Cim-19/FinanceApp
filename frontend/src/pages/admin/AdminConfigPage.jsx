@@ -151,6 +151,9 @@ export default function AdminConfigPage() {
               onChange={(v) => setCulqi((c) => ({ ...c, private_key: v }))}
               placeholder="sk_test_xxxxxxxxxxxx"
             />
+            <p className="text-xs text-gray-400 mt-1">
+              Por seguridad, el servidor solo muestra los últimos 4 caracteres de la llave ya guardada. Escribe una llave nueva para reemplazarla.
+            </p>
           </div>
 
           <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl text-xs text-amber-700 dark:text-amber-400">

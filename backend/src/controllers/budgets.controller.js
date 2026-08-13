@@ -38,6 +38,12 @@ exports.list = async (req, res, next) => {
 exports.create = async (req, res, next) => {
   try {
     const { categoryId, month, year, amount } = req.body;
+
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, OR: [{ userId: req.user.id }, { isSystem: true }] },
+    });
+    if (!category) return res.status(404).json({ success: false, error: 'Categoría no encontrada' });
+
     const budget = await prisma.budget.create({
       data: {
         userId: req.user.id,

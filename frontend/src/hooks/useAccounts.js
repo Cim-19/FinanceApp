@@ -63,7 +63,9 @@ export default function useAccounts() {
     ));
   };
 
-  const totalBalance = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
+  // Se suma en centavos enteros y se divide al final para evitar artefactos de
+  // redondeo de punto flotante al acumular muchos balances decimales.
+  const totalBalance = accounts.reduce((sum, a) => sum + Math.round(Number(a.balance) * 100), 0) / 100;
 
   const byType = {
     CORRIENTE: accounts.filter((a) => a.type === 'CORRIENTE'),

@@ -10,7 +10,7 @@ import {
   getBalanceEvolution, exportCsv, exportPdf,
 } from '../api/reports';
 import MonthSelector   from '../components/dashboard/MonthSelector';
-import { formatCurrency } from '../utils/formatCurrency';
+import { formatCurrency, getCurrencySymbol } from '../utils/formatCurrency';
 import { localToday }     from '../utils/formatDate';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -261,7 +261,7 @@ function TabAnnual() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false}
-                  tickFormatter={(v) => `S/.${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+                  tickFormatter={(v) => `${getCurrencySymbol()}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
                 <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(99,102,241,0.05)', radius: 8 }} />
                 <Bar dataKey="Ingresos" fill="#10b981" radius={[6,6,0,0]} maxBarSize={36} />
                 <Bar dataKey="Egresos"  fill="#f43f5e" radius={[6,6,0,0]} maxBarSize={36} />
@@ -312,7 +312,7 @@ function TabByCategory() {
     try {
       const { data: res } = await getByCategoryReport({ desde, hasta, type: type || undefined });
       setData(res.data.filter((d) => d.total > 0));
-    } catch {}
+    } catch { /* ignore */ }
     finally { setLoading(false); }
   }, [desde, hasta, type]);
 

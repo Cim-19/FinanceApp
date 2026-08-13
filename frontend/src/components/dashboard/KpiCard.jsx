@@ -1,7 +1,7 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatCurrency';
 
-export default function KpiCard({ title, value, icon, gradient, light, textColor, trend, trendLabel, currency = 'PEN' }) {
+export default function KpiCard({ title, value, icon, gradient, light, textColor, trend, trendLabel, currency }) {
   const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : Minus;
   const trendColor = trend > 0 ? 'text-emerald-500' : trend < 0 ? 'text-rose-500' : 'text-gray-400';
 

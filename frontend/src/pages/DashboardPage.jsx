@@ -25,7 +25,7 @@ export default function DashboardPage() {
 
   const handleMonthChange = (m, y) => { setMonth(m); setYear(y); };
 
-  const totalBalance = data?.accounts?.reduce((s, a) => s + Number(a.balance), 0) ?? 0;
+  const totalBalance = (data?.accounts?.reduce((s, a) => s + Math.round(Number(a.balance) * 100), 0) ?? 0) / 100;
 
   if (error) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">

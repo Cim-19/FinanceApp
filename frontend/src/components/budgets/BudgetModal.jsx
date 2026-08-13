@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import useCategories from '../../hooks/useCategories';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const EMPTY = { categoryId: '', amount: '' };
 
@@ -84,7 +85,7 @@ export default function BudgetModal({ open, onClose, onSave, editing }) {
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Límite mensual</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">S/.</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">{getCurrencySymbol()}</span>
               <input
                 type="number"
                 min="1"
@@ -104,7 +105,7 @@ export default function BudgetModal({ open, onClose, onSave, editing }) {
               <div>
                 <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">{selected.name}</p>
                 <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Límite: S/. {parseFloat(form.amount || 0).toFixed(2)} / mes
+                  Límite: {getCurrencySymbol()} {parseFloat(form.amount || 0).toFixed(2)} / mes
                 </p>
               </div>
             </div>

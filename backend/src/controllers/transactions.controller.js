@@ -79,6 +79,13 @@ exports.create = async (req, res, next) => {
     const account = await prisma.account.findFirst({ where: { id: accountId, userId: req.user.id } });
     if (!account) return res.status(404).json({ success: false, error: 'Cuenta no encontrada' });
 
+    if (categoryId) {
+      const category = await prisma.category.findFirst({
+        where: { id: categoryId, OR: [{ userId: req.user.id }, { isSystem: true }] },
+      });
+      if (!category) return res.status(404).json({ success: false, error: 'Categoría no encontrada' });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       const transaction = await tx.transaction.create({
         data: {
@@ -187,6 +194,18 @@ exports.update = async (req, res, next) => {
     const newType      = type      || existing.type;
     const newAmount    = amount !== undefined ? Number(amount) : Number(existing.amount);
 
+    if (accountId && accountId !== existing.accountId) {
+      const account = await prisma.account.findFirst({ where: { id: accountId, userId: req.user.id } });
+      if (!account) return res.status(404).json({ success: false, error: 'Cuenta no encontrada' });
+    }
+
+    if (categoryId) {
+      const category = await prisma.category.findFirst({
+        where: { id: categoryId, OR: [{ userId: req.user.id }, { isSystem: true }] },
+      });
+      if (!category) return res.status(404).json({ success: false, error: 'Categoría no encontrada' });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       // Revertir efecto anterior en cuenta original
       await tx.account.update({
@@ -219,11 +238,35 @@ exports.update = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const FREE_MONTHLY_TRANSACTION_LIMIT = 50;
+
 exports.importBulk = async (req, res, next) => {
   try {
     const { transactions } = req.body;
     if (!Array.isArray(transactions) || transactions.length === 0) {
       return res.status(400).json({ success: false, error: 'Se requiere un array de transacciones' });
+    }
+
+    // El plan Free tiene un límite mensual de transacciones; la importación
+    // masiva no puede usarse para evadirlo, así que se recorta al cupo restante.
+    const subscription = await prisma.subscription.findUnique({ where: { userId: req.user.id } });
+    let rows = transactions.slice(0, 500);
+    if ((subscription?.plan || 'FREE') === 'FREE') {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      const usedThisMonth = await prisma.transaction.count({
+        where: { userId: req.user.id, createdAt: { gte: start, lte: end } },
+      });
+      const remaining = Math.max(0, FREE_MONTHLY_TRANSACTION_LIMIT - usedThisMonth);
+      if (remaining === 0) {
+        return res.status(403).json({
+          success: false,
+          error: `Plan Free: máximo ${FREE_MONTHLY_TRANSACTION_LIMIT} transacciones por mes. Actualiza a Pro.`,
+          code: 'PLAN_LIMIT_TRANSACTIONS',
+        });
+      }
+      rows = rows.slice(0, remaining);
     }
 
     // Pre-load user's accounts and categories for name-matching
@@ -241,48 +284,70 @@ exports.importBulk = async (req, res, next) => {
     let imported = 0;
     const errors = [];
 
-    for (const row of transactions.slice(0, 500)) {
-      try {
-        const type   = (row.type || '').toUpperCase();
-        const amount = parseFloat(row.amount);
-        const date   = new Date(row.date);
+    const importRow = async (row) => {
+      const type   = (row.type || '').toUpperCase();
+      const amount = parseFloat(row.amount);
+      const date   = new Date(row.date);
 
-        if (!['INGRESO', 'EGRESO'].includes(type)) throw new Error('Tipo inválido');
-        if (isNaN(amount) || amount <= 0)          throw new Error('Monto inválido');
-        if (isNaN(date.getTime()))                  throw new Error('Fecha inválida');
+      if (!['INGRESO', 'EGRESO'].includes(type)) throw new Error('Tipo inválido');
+      if (isNaN(amount) || amount <= 0)          throw new Error('Monto inválido');
+      if (isNaN(date.getTime()))                  throw new Error('Fecha inválida');
 
-        const accountId = accountMap[(row.account || '').toLowerCase()];
-        if (!accountId) throw new Error(`Cuenta "${row.account}" no encontrada`);
+      const accountId = accountMap[(row.account || '').toLowerCase()];
+      if (!accountId) throw new Error(`Cuenta "${row.account}" no encontrada`);
 
-        const categoryId = categoryMap[(row.category || '').toLowerCase()] || null;
+      const categoryId = categoryMap[(row.category || '').toLowerCase()] || null;
 
-        await prisma.$transaction(async (tx) => {
-          await tx.transaction.create({
-            data: {
-              userId:      req.user.id,
-              accountId,
-              categoryId,
-              type,
-              amount,
-              description: row.description || null,
-              date,
-              tags:        [],
-              isTransfer:  false,
-            },
-          });
-          await tx.account.update({
-            where: { id: accountId },
-            data:  { balance: { [type === 'INGRESO' ? 'increment' : 'decrement']: amount } },
-          });
+      await prisma.$transaction(async (tx) => {
+        await tx.transaction.create({
+          data: {
+            userId:      req.user.id,
+            accountId,
+            categoryId,
+            type,
+            amount,
+            description: row.description || null,
+            date,
+            tags:        [],
+            isTransfer:  false,
+          },
         });
+        await tx.account.update({
+          where: { id: accountId },
+          data:  { balance: { [type === 'INGRESO' ? 'increment' : 'decrement']: amount } },
+        });
+      });
+    };
 
-        imported++;
-      } catch (err) {
-        errors.push({ row, error: err.message });
-      }
+    // Se procesa en lotes concurrentes en vez de una fila a la vez — cada
+    // increment/decrement de balance ya es atómico a nivel de fila en Postgres,
+    // así que el paralelismo dentro de un lote es seguro.
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+      const batch = rows.slice(i, i + BATCH_SIZE);
+      const results = await Promise.allSettled(batch.map(importRow));
+      results.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+          imported++;
+        } else {
+          errors.push({ row: batch[idx], error: result.reason?.message || 'Error desconocido' });
+        }
+      });
     }
 
-    res.json({ success: true, data: { imported, errors, total: transactions.length } });
+    const skippedByPlan = transactions.length - rows.length;
+    res.json({
+      success: true,
+      data: {
+        imported,
+        errors,
+        total: transactions.length,
+        ...(skippedByPlan > 0 && {
+          skippedByPlan,
+          planLimitMessage: `Plan Free: solo se importaron ${rows.length} de ${transactions.length} filas por el límite de ${FREE_MONTHLY_TRANSACTION_LIMIT} transacciones/mes.`,
+        }),
+      },
+    });
   } catch (err) { next(err); }
 };
 

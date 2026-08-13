@@ -40,7 +40,7 @@ export default function TransactionsPage() {
   const { rules: recurringRules, loading: recurringLoading, update: updateRecurring, remove: removeRecurring } = useRecurring();
 
   const [txModal,  setTxModal ] = useState({ open: false, initial: null });
-  const [delModal, setDelModal] = useState({ open: false, tx: null, loading: false });
+  const [delModal, setDelModal] = useState({ open: false, tx: null, loading: false, error: '' });
 
   const openCreate = ()   => setTxModal({ open: true, initial: null });
   const openEdit   = (tx) => setTxModal({ open: true, initial: tx  });
@@ -51,13 +51,12 @@ export default function TransactionsPage() {
   };
 
   const handleDelete = async () => {
-    setDelModal((d) => ({ ...d, loading: true }));
+    setDelModal((d) => ({ ...d, loading: true, error: '' }));
     try {
       await remove(delModal.tx.id);
-      setDelModal({ open: false, tx: null, loading: false });
+      setDelModal({ open: false, tx: null, loading: false, error: '' });
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al eliminar');
-      setDelModal((d) => ({ ...d, loading: false }));
+      setDelModal((d) => ({ ...d, loading: false, error: err.response?.data?.error || 'Error al eliminar' }));
     }
   };
 
@@ -200,7 +199,7 @@ export default function TransactionsPage() {
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        <button onClick={() => setDelModal({ open: true, tx, loading: false })}
+                        <button onClick={() => setDelModal({ open: true, tx, loading: false, error: '' })}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -241,7 +240,7 @@ export default function TransactionsPage() {
                       <button onClick={() => openEdit(tx)} className="p-1 text-gray-400 hover:text-violet-600 rounded-lg transition">
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => setDelModal({ open: true, tx, loading: false })} className="p-1 text-gray-400 hover:text-red-500 rounded-lg transition">
+                      <button onClick={() => setDelModal({ open: true, tx, loading: false, error: '' })} className="p-1 text-gray-400 hover:text-red-500 rounded-lg transition">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -304,9 +303,10 @@ export default function TransactionsPage() {
       <DeleteConfirmModal
         open={delModal.open}
         loading={delModal.loading}
+        error={delModal.error}
         title="¿Eliminar transacción?"
         description="Esta acción revertirá el saldo de la cuenta y no se puede deshacer."
-        onClose={() => setDelModal({ open: false, tx: null, loading: false })}
+        onClose={() => setDelModal({ open: false, tx: null, loading: false, error: '' })}
         onConfirm={handleDelete}
       />
     </div>

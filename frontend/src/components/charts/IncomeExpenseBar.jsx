@@ -2,6 +2,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -12,7 +13,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <div key={p.name} className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
           <span className="text-gray-500 dark:text-gray-400">{p.name}:</span>
-          <span className="font-bold text-gray-800 dark:text-white">S/. {Number(p.value).toFixed(2)}</span>
+          <span className="font-bold text-gray-800 dark:text-white">{getCurrencySymbol()} {Number(p.value).toFixed(2)}</span>
         </div>
       ))}
     </div>
@@ -38,7 +39,7 @@ export default function IncomeExpenseBar({ data }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}
-            tickFormatter={(v) => `S/.${v >= 1000 ? `${(v/1000).toFixed(1)}k` : v}`} />
+            tickFormatter={(v) => `${getCurrencySymbol()}${v >= 1000 ? `${(v/1000).toFixed(1)}k` : v}`} />
           <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99,102,241,0.05)', radius: 8 }} />
           <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
           <Bar dataKey="Ingresos" fill="#10b981" radius={[6,6,0,0]} maxBarSize={40} />

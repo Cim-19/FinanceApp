@@ -10,7 +10,7 @@ export default function useCategories() {
     try {
       const { data } = await getCategories();
       setCategories(data.data);
-    } catch {}
+    } catch { /* ignore */ }
     finally { setLoading(false); }
   }, []);
 

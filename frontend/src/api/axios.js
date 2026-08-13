@@ -1,5 +1,6 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
+import { clearUserDataCaches } from '../utils/clearAppCaches';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -24,6 +25,15 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// Pide un accessToken nuevo usando la cookie httpOnly de refresh. Se usa tanto
+// en el interceptor de 401 como en el bootstrap inicial de App.jsx.
+export async function refreshAccessToken() {
+  const { data } = await axios.post(`${BASE}/auth/refresh`, {}, { withCredentials: true });
+  const newToken = data.data.accessToken;
+  useAuthStore.getState().setAuth(useAuthStore.getState().user, newToken);
+  return newToken;
+}
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -45,16 +55,14 @@ api.interceptors.response.use(
     isRefreshing     = true;
 
     try {
-      const { data } = await axios.post(`${BASE}/auth/refresh`, {}, { withCredentials: true });
-      const newToken = data.data.accessToken;
-      useAuthStore.getState().setAuth(useAuthStore.getState().user, newToken);
+      const newToken = await refreshAccessToken();
       processQueue(null, newToken);
       original.headers.Authorization = `Bearer ${newToken}`;
       return api(original);
     } catch (refreshError) {
       processQueue(refreshError, null);
       useAuthStore.getState().clearAuth();
-      window.location.href = '/login';
+      clearUserDataCaches().finally(() => { window.location.href = '/login'; });
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

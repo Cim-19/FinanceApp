@@ -1,14 +1,20 @@
 const webpush = require('web-push');
 const prisma   = require('../config/prisma');
 
-webpush.setVapidDetails(
-  `mailto:${process.env.VAPID_EMAIL || 'admin@financeapp.com'}`,
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
+// Sin claves VAPID configuradas, las push notifications quedan desactivadas
+// en vez de tumbar el arranque del servidor entero.
+const vapidConfigured = Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
+if (vapidConfigured) {
+  webpush.setVapidDetails(
+    `mailto:${process.env.VAPID_EMAIL || 'admin@financeapp.com'}`,
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 // Envía push a un usuario específico
 async function sendPushToUser(userId, payload) {
+  if (!vapidConfigured) return;
   const subs = await prisma.pushSubscription.findMany({ where: { userId } });
   for (const sub of subs) {
     try {
@@ -27,6 +33,7 @@ async function sendPushToUser(userId, payload) {
 
 // Envía push a todos los usuarios con suscripción activa
 async function sendPushToAll(payload) {
+  if (!vapidConfigured) return;
   const subs = await prisma.pushSubscription.findMany({ include: { user: { select: { isActive: true } } } });
   const active = subs.filter((s) => s.user.isActive);
   for (const sub of active) {

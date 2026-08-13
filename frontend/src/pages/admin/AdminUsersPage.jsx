@@ -201,7 +201,7 @@ export default function AdminUsersPage() {
       setUsers(data.data.users);
       setTotal(data.data.total);
       setPages(data.data.pages);
-    } catch {}
+    } catch { /* ignore */ }
     finally { setLoading(false); }
   }, [search, plan, page]);
 
