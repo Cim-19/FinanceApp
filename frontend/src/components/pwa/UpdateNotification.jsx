@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
