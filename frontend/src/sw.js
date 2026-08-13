@@ -3,10 +3,20 @@ import { registerRoute, NavigationRoute }          from 'workbox-routing';
 import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { ExpirationPlugin }        from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { clientsClaim }            from 'workbox-core';
 
 // Precache estático inyectado por Vite-PWA
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
+
+// UpdateNotification.jsx llama a updateServiceWorker(true), que le manda este
+// mensaje al SW en espera para activarlo de inmediato. Con la estrategia
+// injectManifest, vite-plugin-pwa NO agrega este listener automáticamente
+// (a diferencia de generateSW) — sin él, el botón "Actualizar" no hace nada.
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+clientsClaim();
 
 // Navegación → siempre index.html
 registerRoute(
