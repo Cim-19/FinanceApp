@@ -24,29 +24,29 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-dvh bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center p-4 py-6 relative overflow-x-hidden">
 
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" />
 
-      <div className="relative w-full max-w-md animate-fade-in">
-        <div className="text-center mb-7">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/95 rounded-3xl shadow-float mb-4">
-            <span className="text-5xl">🔐</span>
+      <div className="relative w-full max-w-md animate-fade-in my-auto">
+        <div className="text-center mb-4 sm:mb-7">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 bg-white/95 rounded-2xl sm:rounded-3xl shadow-float mb-2.5 sm:mb-4">
+            <span className="text-3xl sm:text-5xl">🔐</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white">Recuperar acceso</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Recuperar acceso</h1>
           <p className="text-orange-100 mt-1 text-sm">Te enviamos un link de recuperación</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-slide-up">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-5 sm:p-8 animate-slide-up">
           {!sent ? (
             <>
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">¿Olvidaste tu contraseña?</h2>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-2">¿Olvidaste tu contraseña?</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4 sm:mb-6">
                 Ingresa tu email y te enviaremos las instrucciones para recuperarla.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Correo electrónico
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          <Link to="/login" className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition">
+          <Link to="/login" className="flex items-center justify-center gap-2 mt-4 sm:mt-6 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition">
             <ArrowLeft className="w-4 h-4" />
             Volver al inicio de sesión
           </Link>

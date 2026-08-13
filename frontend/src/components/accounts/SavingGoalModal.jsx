@@ -69,11 +69,14 @@ export default function SavingGoalModal({ open, account, onClose, onSave, onDele
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pb-16 sm:pb-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-white dark:bg-gray-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[85svh] sm:max-h-[92vh] flex flex-col animate-slide-up"
+        onClick={(e) => e.stopPropagation()}
+      >
 
         {/* Header */}
-        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 relative overflow-hidden flex-shrink-0">
           <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -translate-y-12 translate-x-12" />
           <div className="absolute left-0 bottom-0 w-20 h-20 bg-white/5 rounded-full translate-y-8 -translate-x-8" />
           <div className="relative flex items-center justify-between mb-3">
@@ -96,7 +99,7 @@ export default function SavingGoalModal({ open, account, onClose, onSave, onDele
           </div>
         </div>
 
-        <div className="p-5 space-y-5">
+        <div className="overflow-y-auto flex-1 p-5 space-y-5">
 
           {/* Preview barra de progreso */}
           {target > 0 && (

@@ -38,38 +38,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-700 via-purple-600 to-indigo-700 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-dvh bg-gradient-to-br from-violet-700 via-purple-600 to-indigo-700 flex items-center justify-center p-4 py-6 relative overflow-x-hidden">
 
       {/* Blobs decorativos */}
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse-slow" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-pulse-slow" />
       <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-slow" />
 
-      <div className="relative w-full max-w-md animate-fade-in">
+      <div className="relative w-full max-w-md animate-fade-in my-auto">
 
         {/* Marca */}
-        <div className="text-center mb-7">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/95 rounded-3xl shadow-float mb-4">
-            <span className="text-5xl">🐷</span>
+        <div className="text-center mb-4 sm:mb-7">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 bg-white/95 rounded-2xl sm:rounded-3xl shadow-float mb-2.5 sm:mb-4">
+            <span className="text-3xl sm:text-5xl">🐷</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">FinanceApp</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">FinanceApp</h1>
           <p className="text-purple-200 mt-1 text-sm">Tu dinero, bajo control 💜</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 animate-slide-up">
-          <div className="flex items-center gap-2 mb-6">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-5 sm:p-8 animate-slide-up">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <Sparkles className="w-5 h-5 text-violet-500" />
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Bienvenido de vuelta</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Bienvenido de vuelta</h2>
           </div>
 
           {error && (
-            <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center gap-2">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-center gap-2">
               <span>⚠️</span> {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -130,7 +130,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 dark:text-gray-400 mt-6 text-sm">
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-4 sm:mt-6 text-sm">
             ¿No tienes cuenta?{' '}
             <Link to="/register" className="text-violet-600 font-semibold hover:underline">
               Regístrate gratis
@@ -139,11 +139,11 @@ export default function LoginPage() {
         </div>
 
         {/* Feature pills */}
-        <div className="mt-5 grid grid-cols-4 gap-2">
+        <div className="mt-3 sm:mt-5 grid grid-cols-4 gap-2">
           {FEATURES.map((f) => (
-            <div key={f.label} className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 text-center">
-              <div className="text-2xl mb-1">{f.icon}</div>
-              <div className="text-white text-xs font-medium">{f.label}</div>
+            <div key={f.label} className="bg-white/15 backdrop-blur-sm rounded-2xl p-2 sm:p-3 text-center">
+              <div className="text-lg sm:text-2xl mb-0.5 sm:mb-1">{f.icon}</div>
+              <div className="text-white text-[10px] sm:text-xs font-medium">{f.label}</div>
             </div>
           ))}
         </div>

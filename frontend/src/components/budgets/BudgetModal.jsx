@@ -44,13 +44,13 @@ export default function BudgetModal({ open, onClose, onSave, editing }) {
   const selected = expense.find((c) => c.id === form.categoryId);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pb-16 sm:pb-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm animate-fade-in">
+      <div className="relative bg-white dark:bg-gray-900 w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl shadow-2xl max-h-[85svh] sm:max-h-[92vh] flex flex-col animate-slide-up">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <h2 className="font-bold text-lg text-gray-800 dark:text-white">
             {editing ? 'Editar presupuesto' : 'Nuevo presupuesto'}
           </h2>
@@ -59,7 +59,7 @@ export default function BudgetModal({ open, onClose, onSave, editing }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-6 space-y-5">
 
           {/* Category selector */}
           <div>
