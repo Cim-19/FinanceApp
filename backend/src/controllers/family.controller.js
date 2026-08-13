@@ -1,5 +1,4 @@
 const prisma  = require('../config/prisma');
-const crypto  = require('crypto');
 const { sendFamilyInvitation } = require('../services/email.service');
 
 const MAX_MEMBERS = 5;
@@ -168,6 +167,9 @@ exports.acceptInvitation = async (req, res, next) => {
     if (invitation.expiresAt < new Date()) {
       await prisma.familyInvitation.update({ where: { token }, data: { status: 'EXPIRED' } });
       return res.status(400).json({ success: false, error: 'Esta invitación ha expirado.' });
+    }
+    if (invitation.email.trim().toLowerCase() !== req.user.email.trim().toLowerCase()) {
+      return res.status(403).json({ success: false, error: 'Esta invitación fue enviada a otro email. Inicia sesión con la cuenta invitada.' });
     }
 
     const existingMember = await prisma.familyMember.findUnique({ where: { userId } });
@@ -433,7 +435,7 @@ exports.updateFamilyGoal = async (req, res, next) => {
     if (!member || member.role !== 'ADMIN') return res.status(403).json({ success: false, error: 'Solo el administrador puede editar metas familiares.' });
 
     const { name, targetAmount, currentAmount, deadline, emoji } = req.body;
-    const goal = await prisma.familySavingGoal.updateMany({
+    await prisma.familySavingGoal.updateMany({
       where: { id: goalId, familyId: member.familyId },
       data: {
         ...(name          !== undefined && { name: name.trim() }),

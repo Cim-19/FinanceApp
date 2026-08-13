@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const crypto = require('crypto');
 
 exports.list = async (req, res, next) => {
   try {
@@ -32,19 +33,19 @@ exports.list = async (req, res, next) => {
       prisma.transaction.count({ where }),
     ]);
 
-    // Para cada EGRESO, buscar el INGRESO par (mismo monto, fecha, descripción)
+    // Para cada EGRESO, buscar el INGRESO par vinculado por transferGroupId
     const enriched = await Promise.all(transfers.map(async (t) => {
-      const partner = await prisma.transaction.findFirst({
-        where: {
-          userId:      req.user.id,
-          isTransfer:  true,
-          type:        'INGRESO',
-          amount:      t.amount,
-          date:        t.date,
-          description: t.description,
-        },
-        include: { account: { select: { id: true, name: true, icon: true, type: true } } },
-      });
+      const partner = t.transferGroupId
+        ? await prisma.transaction.findFirst({
+            where: {
+              userId:          req.user.id,
+              isTransfer:      true,
+              type:            'INGRESO',
+              transferGroupId: t.transferGroupId,
+            },
+            include: { account: { select: { id: true, name: true, icon: true, type: true } } },
+          })
+        : null;
       return { ...t, toAccount: partner?.account ?? null };
     }));
 
@@ -76,6 +77,7 @@ exports.create = async (req, res, next) => {
 
     const txDate = date ? new Date(date) : new Date();
     const desc   = description || `Transferencia: ${fromAccount.name} → ${toAccount.name}`;
+    const transferGroupId = crypto.randomUUID();
 
     const result = await prisma.$transaction(async (tx) => {
       const egreso = await tx.transaction.create({
@@ -87,6 +89,7 @@ exports.create = async (req, res, next) => {
           description: desc,
           date:        txDate,
           isTransfer:  true,
+          transferGroupId,
           tags:        [],
         },
       });
@@ -100,6 +103,7 @@ exports.create = async (req, res, next) => {
           description: desc,
           date:        txDate,
           isTransfer:  true,
+          transferGroupId,
           tags:        [],
         },
       });

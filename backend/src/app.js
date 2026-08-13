@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
 const errorHandler = require('./middlewares/errorHandler');
+const { apiLimiter } = require('./middlewares/rateLimit');
 
 // Routes
 const authRoutes         = require('./routes/auth.routes');
@@ -31,6 +32,10 @@ const { startPushCrons }     = require('./services/push.cron');
 
 const app = express();
 
+// Railway (y Vercel del lado del frontend) sirven detrás de un proxy inverso;
+// sin esto, express-rate-limit ve la IP del proxy en vez de la del cliente.
+app.set('trust proxy', 1);
+
 // ── Seguridad y parsers ───────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
@@ -40,6 +45,7 @@ app.use(cors({
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/api', apiLimiter);
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

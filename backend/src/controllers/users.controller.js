@@ -43,7 +43,10 @@ exports.changePassword = async (req, res, next) => {
     }
 
     const hashed = await bcrypt.hash(newPassword, 12);
-    await prisma.user.update({ where: { id: req.user.id }, data: { password: hashed } });
+    await prisma.user.update({
+      where: { id: req.user.id },
+      data:  { password: hashed, tokenVersion: { increment: 1 } },
+    });
 
     res.json({ success: true, message: 'Contraseña actualizada correctamente' });
   } catch (err) { next(err); }

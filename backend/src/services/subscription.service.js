@@ -44,13 +44,54 @@ async function checkExpiringSubscriptions() {
   }
 }
 
+// No hay recobro automático (Culqi se usa con cargos únicos, sin tarjeta guardada),
+// así que una suscripción pagada nunca debe seguir activa después de su fecha de
+// renovación sin un nuevo pago — se baja a FREE/EXPIRED en vez de quedar indefinida.
+async function expireOverdueSubscriptions() {
+  const now = new Date();
+
+  const overdue = await prisma.subscription.findMany({
+    where: {
+      plan:        { not: 'FREE' },
+      status:      'ACTIVE',
+      renewalDate: { lt: now },
+    },
+    include: { user: { select: { id: true, email: true, name: true } } },
+  });
+
+  for (const sub of overdue) {
+    const planName = PLAN_LABEL[sub.plan] || sub.plan;
+
+    await prisma.subscription.update({
+      where: { userId: sub.userId },
+      data:  { plan: 'FREE', status: 'EXPIRED' },
+    });
+
+    await createIfNotToday(sub.userId, {
+      type:  'SUBSCRIPTION_EXPIRING',
+      title: `Tu plan ${planName} expiró`,
+      body:  'No se detectó un nuevo pago antes de la fecha de renovación. Tu cuenta volvió al plan Free.',
+      link:  '/settings',
+    }).catch(() => {});
+
+    email.sendSubscriptionExpiring?.(sub.user.email, sub.user.name, planName, sub.renewalDate).catch(() => {});
+  }
+
+  if (overdue.length > 0) {
+    console.log(`⬇️  [Subscriptions] ${overdue.length} suscripciones vencidas bajadas a FREE`);
+  }
+}
+
 function startSubscriptionJob() {
   cron.schedule('10 9 * * *', () => {
     checkExpiringSubscriptions().catch((err) =>
       console.error('[Subscriptions] Cron error:', err.message)
     );
+    expireOverdueSubscriptions().catch((err) =>
+      console.error('[Subscriptions] Expiry cron error:', err.message)
+    );
   });
   console.log('🔔  Subscription expiry job iniciado (diario 09:10)');
 }
 
-module.exports = { startSubscriptionJob, checkExpiringSubscriptions };
+module.exports = { startSubscriptionJob, checkExpiringSubscriptions, expireOverdueSubscriptions };

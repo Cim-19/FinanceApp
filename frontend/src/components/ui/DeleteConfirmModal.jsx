@@ -1,6 +1,6 @@
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, AlertCircle } from 'lucide-react';
 
-export default function DeleteConfirmModal({ open, onClose, onConfirm, title, description, loading }) {
+export default function DeleteConfirmModal({ open, onClose, onConfirm, title, description, loading, error }) {
   if (!open) return null;
 
   return (
@@ -18,6 +18,13 @@ export default function DeleteConfirmModal({ open, onClose, onConfirm, title, de
 
         <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-1">{title || '¿Eliminar?'}</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{description || 'Esta acción no se puede deshacer.'}</p>
+
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 rounded-xl px-3 py-2.5 mb-4 text-left">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
 
         <div className="flex gap-3">
           <button onClick={onClose} className="btn-secondary flex-1 py-2.5">Cancelar</button>

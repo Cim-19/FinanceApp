@@ -38,8 +38,8 @@ export default function useBudgets(month, year) {
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   };
 
-  const totalBudgeted = budgets.reduce((s, b) => s + Number(b.amount), 0);
-  const totalSpent    = budgets.reduce((s, b) => s + (b.spent || 0), 0);
+  const totalBudgeted = budgets.reduce((s, b) => s + Math.round(Number(b.amount) * 100), 0) / 100;
+  const totalSpent    = budgets.reduce((s, b) => s + Math.round(Number(b.spent || 0) * 100), 0) / 100;
 
   return { budgets, totalBudgeted, totalSpent, loading, error, fetch, create, update, remove };
 }

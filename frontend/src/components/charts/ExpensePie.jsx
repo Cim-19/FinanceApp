@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
@@ -9,7 +10,7 @@ const CustomTooltip = ({ active, payload }) => {
         <span>{p.icon}</span>
         <span className="font-semibold text-gray-800 dark:text-white">{name}</span>
       </div>
-      <p className="text-gray-500 dark:text-gray-400">S/. <span className="font-bold text-gray-800 dark:text-white">{Number(value).toFixed(2)}</span></p>
+      <p className="text-gray-500 dark:text-gray-400">{getCurrencySymbol()} <span className="font-bold text-gray-800 dark:text-white">{Number(value).toFixed(2)}</span></p>
       <p className="text-gray-400 text-xs">{p.percentage}% del total</p>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Target, Trash2, TrendingUp, Clock, CheckCircle2 } from 'lucide-react';
-import { formatCurrency } from '../../utils/formatCurrency';
+import { formatCurrency, getCurrencySymbol } from '../../utils/formatCurrency';
 
 function daysLeft(deadline) {
   const diff = new Date(deadline).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0);
@@ -159,7 +159,7 @@ export default function SavingGoalModal({ open, account, onClose, onSave, onDele
                 Monto objetivo *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">S/.</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">{getCurrencySymbol()}</span>
                 <input
                   type="number"
                   min="0"

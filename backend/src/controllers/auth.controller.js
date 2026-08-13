@@ -7,11 +7,13 @@ const email    = require('../services/email.service');
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const generateTokens = (user) => {
-  const payload = { id: user.id, email: user.email };
+  const payload = { id: user.id, email: user.email, tokenVersion: user.tokenVersion || 0 };
   const accessToken  = jwt.sign(payload, process.env.JWT_SECRET,         { expiresIn: '15m' });
   const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d'  });
   return { accessToken, refreshToken };
 };
+
+const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -92,16 +94,25 @@ exports.login = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-exports.refresh = (req, res) => {
+exports.refresh = async (req, res) => {
   const token = req.cookies?.refreshToken;
   if (!token) {
     return res.status(401).json({ success: false, error: 'Refresh token requerido' });
   }
 
   try {
-    const payload     = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+
+    // Se revalida contra la base en cada refresh: una cuenta desactivada o una
+    // contraseña reseteada invalida los refresh tokens ya emitidos, en vez de
+    // dejarlos operar hasta su expiración de 7 días.
+    const user = await prisma.user.findUnique({ where: { id: payload.id } });
+    if (!user || !user.isActive || (payload.tokenVersion || 0) !== (user.tokenVersion || 0)) {
+      return res.status(401).json({ success: false, error: 'Sesión inválida, inicia sesión nuevamente' });
+    }
+
     const accessToken = jwt.sign(
-      { id: payload.id, email: payload.email },
+      { id: user.id, email: user.email, tokenVersion: user.tokenVersion },
       process.env.JWT_SECRET,
       { expiresIn: '15m' }
     );
@@ -129,9 +140,11 @@ exports.forgotPassword = async (req, res, next) => {
     const token  = crypto.randomBytes(32).toString('hex');
     const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
+    // Se guarda el hash del token, no el token en claro — si la base se filtra,
+    // los enlaces de reset ya emitidos no quedan directamente utilizables.
     await prisma.user.update({
       where: { id: user.id },
-      data:  { resetToken: token, resetTokenExpiry: expiry },
+      data:  { resetToken: hashToken(token), resetTokenExpiry: expiry },
     });
 
     await email.sendPasswordReset(user.email, user.name, token);
@@ -152,7 +165,7 @@ exports.resetPassword = async (req, res, next) => {
 
     const user = await prisma.user.findFirst({
       where: {
-        resetToken:       token,
+        resetToken:       hashToken(token),
         resetTokenExpiry: { gt: new Date() },
       },
     });
@@ -164,7 +177,12 @@ exports.resetPassword = async (req, res, next) => {
     const hashed = await bcrypt.hash(newPassword, 12);
     await prisma.user.update({
       where: { id: user.id },
-      data:  { password: hashed, resetToken: null, resetTokenExpiry: null },
+      data:  {
+        password: hashed,
+        resetToken: null,
+        resetTokenExpiry: null,
+        tokenVersion: { increment: 1 }, // invalida cualquier refresh token ya emitido
+      },
     });
 
     res.json({ success: true, message: 'Contraseña actualizada correctamente' });

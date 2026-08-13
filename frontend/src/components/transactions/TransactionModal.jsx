@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, TrendingUp, TrendingDown, Tag, RefreshCw, ChevronDown } from 'lucide-react';
 import { iconEmoji } from '../../utils/accountTypes';
 import { localToday } from '../../utils/formatDate';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const FREQUENCIES = [
   { value: 'DAILY',   label: 'Diario'   },
@@ -129,7 +130,7 @@ export default function TransactionModal({ open, onClose, onSave, initial, accou
           <div className={`rounded-2xl p-4 text-center ${isIngreso ? 'bg-emerald-50 dark:bg-emerald-900/20' : 'bg-rose-50 dark:bg-rose-900/20'}`}>
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Monto</p>
             <div className="flex items-center justify-center gap-2">
-              <span className={`text-2xl font-bold ${isIngreso ? 'text-emerald-600' : 'text-rose-600'}`}>S/.</span>
+              <span className={`text-2xl font-bold ${isIngreso ? 'text-emerald-600' : 'text-rose-600'}`}>{getCurrencySymbol()}</span>
               <input
                 type="number" min="0.01" step="0.01" value={form.amount}
                 onChange={(e) => set('amount', e.target.value)}

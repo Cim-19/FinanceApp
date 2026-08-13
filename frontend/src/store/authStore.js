@@ -7,10 +7,15 @@ const useAuthStore = create(
     (set) => ({
       user:        null,
       accessToken: null,
+      // true hasta que App intenta renovar el accessToken (con la cookie httpOnly
+      // de refresh) al cargar la página — evita que las rutas protegidas redirijan
+      // a /login antes de saber si la sesión sigue siendo válida.
+      isBootstrapping: true,
 
       setAuth:  (user, accessToken) => set({ user, accessToken }),
       updateUser: (partial)         => set((s) => ({ user: { ...s.user, ...partial } })),
       clearAuth:  ()                => set({ user: null, accessToken: null }),
+      setBootstrapped: () => set({ isBootstrapping: false }),
 
       // Sincroniza user con el servidor — llamar después de operaciones que cambian el plan
       refreshUser: async () => {
@@ -32,8 +37,12 @@ const useAuthStore = create(
       },
     }),
     {
-      name:       'finance-auth',
-      partialize: (s) => ({ user: s.user, accessToken: s.accessToken }),
+      name: 'finance-auth',
+      // El accessToken ya NO se persiste en localStorage — solo vive en memoria.
+      // Así, un XSS que lea localStorage no obtiene un token utilizable; al
+      // recargar la página, App vuelve a pedir uno nuevo con la cookie httpOnly
+      // de refresh (ver App.jsx).
+      partialize: (s) => ({ user: s.user }),
     }
   )
 );

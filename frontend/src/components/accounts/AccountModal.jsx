@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
 import { ACCOUNT_TYPES, ACCOUNT_ICONS, ACCOUNT_COLORS } from '../../utils/accountTypes';
 import { localToday } from '../../utils/formatDate';
+import { getCurrencySymbol } from '../../utils/formatCurrency';
 
 const TYPES = Object.entries(ACCOUNT_TYPES).map(([value, meta]) => ({
   value, label: meta.label, emoji: meta.emoji, gradient: meta.gradient,
@@ -133,7 +134,7 @@ export default function AccountModal({ open, onClose, onSave, initial }) {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Saldo inicial</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">S/.</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">{getCurrencySymbol()}</span>
                 <input type="number" min="0" step="0.01" value={form.balance}
                   onChange={(e) => set('balance', e.target.value)}
                   className="input-base pl-10" placeholder="0.00" />
@@ -179,7 +180,7 @@ export default function AccountModal({ open, onClose, onSave, initial }) {
               <div>
                 <label className="block text-xs text-emerald-600 dark:text-emerald-400 mb-1">Monto objetivo</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">S/.</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">{getCurrencySymbol()}</span>
                   <input type="number" min="1" step="0.01" value={form.savingGoal.targetAmount}
                     onChange={(e) => setGoal('targetAmount', e.target.value)}
                     className="input-base pl-10" placeholder="0.00" />

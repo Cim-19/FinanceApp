@@ -1,6 +1,6 @@
 const { Prisma } = require('@prisma/client');
 
-module.exports = (err, req, res, next) => {
+module.exports = (err, req, res, _next) => {
   console.error('[ErrorHandler]', err.message || err);
 
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -20,7 +20,13 @@ module.exports = (err, req, res, next) => {
   }
 
   const status = err.statusCode || err.status || 500;
-  const message = err.message || 'Error interno del servidor';
+
+  // Para errores no reconocidos (500), en producción no se filtra el mensaje
+  // crudo del error (puede contener detalles internos de conexión, stacks, etc.)
+  const isProd = process.env.NODE_ENV === 'production';
+  const message = (status >= 500 && isProd)
+    ? 'Error interno del servidor'
+    : (err.message || 'Error interno del servidor');
 
   res.status(status).json({ success: false, error: message });
 };

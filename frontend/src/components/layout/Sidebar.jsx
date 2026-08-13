@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import useAuthStore   from '../../store/authStore';
 import { logout }     from '../../api/auth';
+import { clearUserDataCaches } from '../../utils/clearAppCaches';
 
 const ADMIN_NAV = [
   { to: '/admin',         label: 'Stats globales', icon: ShieldCheck,       grad: 'from-rose-500 to-red-600',     bg: 'bg-rose-50    dark:bg-rose-900/30'   },
@@ -56,6 +57,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try { await logout(); } catch { /* ignore */ }
+    await clearUserDataCaches();
     clearAuth();
     navigate('/login');
   };

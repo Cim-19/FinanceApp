@@ -22,7 +22,7 @@ export default function AccountsPage() {
   const [accountModal,  setAccountModal ] = useState({ open: false, initial: null });
   const [goalModal,     setGoalModal    ] = useState({ open: false, account: null });
   const [transferModal, setTransferModal] = useState({ open: false, defaultFrom: null });
-  const [deleteModal,   setDeleteModal  ] = useState({ open: false, account: null, loading: false });
+  const [deleteModal,   setDeleteModal  ] = useState({ open: false, account: null, loading: false, error: '' });
 
   const openCreate   = ()        => setAccountModal({ open: true,  initial: null });
   const openEdit     = (account) => setAccountModal({ open: true,  initial: account });
@@ -35,13 +35,12 @@ export default function AccountsPage() {
   };
 
   const handleDelete = async () => {
-    setDeleteModal((d) => ({ ...d, loading: true }));
+    setDeleteModal((d) => ({ ...d, loading: true, error: '' }));
     try {
       await remove(deleteModal.account.id);
-      setDeleteModal({ open: false, account: null, loading: false });
+      setDeleteModal({ open: false, account: null, loading: false, error: '' });
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al eliminar');
-      setDeleteModal((d) => ({ ...d, loading: false }));
+      setDeleteModal((d) => ({ ...d, loading: false, error: err.response?.data?.error || 'Error al eliminar' }));
     }
   };
 
@@ -78,7 +77,7 @@ export default function AccountsPage() {
           {/* Mini stats */}
           <div className="grid grid-cols-4 gap-3">
             {Object.entries(ACCOUNT_TYPES).map(([type, meta]) => {
-              const total = (byType[type] || []).reduce((s, a) => s + Number(a.balance), 0);
+              const total = (byType[type] || []).reduce((s, a) => s + Math.round(Number(a.balance) * 100), 0) / 100;
               return (
                 <div key={type} className="bg-white/10 rounded-xl p-2.5 text-center">
                   <p className="text-lg">{meta.emoji}</p>
@@ -106,7 +105,7 @@ export default function AccountsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {byType.AHORRO.map((account) => (
               <AccountCard key={account.id} account={account}
-                onEdit={openEdit} onDelete={(a) => setDeleteModal({ open: true, account: a, loading: false })}
+                onEdit={openEdit} onDelete={(a) => setDeleteModal({ open: true, account: a, loading: false, error: '' })}
                 onTransfer={openTransfer} onGoal={openGoal} />
             ))}
           </div>
@@ -129,7 +128,7 @@ export default function AccountsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {byType[type].map((account) => (
                 <AccountCard key={account.id} account={account}
-                  onEdit={openEdit} onDelete={(a) => setDeleteModal({ open: true, account: a, loading: false })}
+                  onEdit={openEdit} onDelete={(a) => setDeleteModal({ open: true, account: a, loading: false, error: '' })}
                   onTransfer={openTransfer} />
               ))}
             </div>
@@ -184,9 +183,10 @@ export default function AccountsPage() {
       <DeleteConfirmModal
         open={deleteModal.open}
         loading={deleteModal.loading}
+        error={deleteModal.error}
         title="¿Eliminar cuenta?"
         description={`Se eliminará "${deleteModal.account?.name}" y todas sus transacciones. Esta acción no se puede deshacer.`}
-        onClose={() => setDeleteModal({ open: false, account: null, loading: false })}
+        onClose={() => setDeleteModal({ open: false, account: null, loading: false, error: '' })}
         onConfirm={handleDelete}
       />
     </div>

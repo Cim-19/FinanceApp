@@ -34,8 +34,11 @@ const planGuard = (action) => async (req, res, next) => {
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), 1);
       const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      // Se cuenta por createdAt (fecha real de creación, controlada por el servidor)
+      // en vez de `date` (controlado por el cliente), para que el límite no se
+      // pueda evadir fechando transacciones fuera del mes actual.
       const count = await prisma.transaction.count({
-        where: { userId: req.user.id, date: { gte: start, lte: end } },
+        where: { userId: req.user.id, createdAt: { gte: start, lte: end } },
       });
       if (count >= LIMITS.FREE.transactionsPerMonth) {
         return res.status(403).json({

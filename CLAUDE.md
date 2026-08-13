@@ -32,7 +32,7 @@ financeapp/
 │
 └── frontend/                  # React + Vite + Tailwind + Recharts (→ Vercel)
     ├── public/
-    │   ├── manifest.json      # PWA manifest
+    │   ├── manifest.webmanifest  # PWA manifest (generado por vite-plugin-pwa)
     │   └── icons/             # Íconos PWA 192x192 y 512x512
     ├── src/
     │   ├── api/               # Axios instances y llamadas al backend
@@ -163,7 +163,7 @@ Ver `backend/prisma/schema.prisma` para el schema completo.
 - Los endpoints de exportación requieren plan Pro (`checkExportPermission`)
 - Usar `prisma.$transaction()` para transferencias y ediciones que afecten balance
 - `isTransfer: true` excluye transacciones de reportes financieros
-- `manifest.json` debe estar en `frontend/public/` y referenciado en `index.html`
+- `manifest.webmanifest` se genera en `frontend/public/` vía `vite-plugin-pwa` y se referencia en `index.html`
 - En Docker, el backend conecta a postgres por hostname `postgres` (no localhost)
 
 ---

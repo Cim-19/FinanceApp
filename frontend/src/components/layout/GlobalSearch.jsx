@@ -155,7 +155,7 @@ export default function GlobalSearch() {
           {total === 0 ? (
             <div className="px-4 py-6 text-center">
               <span className="text-2xl block mb-1">🔍</span>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Sin resultados para <span className="font-semibold">"{query}"</span></p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Sin resultados para <span className="font-semibold">&quot;{query}&quot;</span></p>
             </div>
           ) : (
             <div className="max-h-96 overflow-y-auto py-1.5">

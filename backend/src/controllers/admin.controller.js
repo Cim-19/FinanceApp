@@ -228,13 +228,26 @@ exports.testNotification = async (req, res, next) => {
 // ── Config del sistema ────────────────────────────────────────────────────────
 
 const CONFIG_KEYS = ['culqi_public_key', 'culqi_private_key', 'price_pro', 'price_family'];
+const SECRET_KEYS = ['culqi_private_key'];
+const MASK_PREFIX = '••••••••';
 
+function maskSecret(value) {
+  if (!value) return '';
+  return `${MASK_PREFIX}${value.slice(-4)}`;
+}
+
+// Nunca se devuelve el valor real de una llave secreta al cliente — solo un
+// placeholder enmascarado. setConfig ignora ese placeholder si vuelve sin cambios,
+// para no pisar el secreto real con la máscara.
 exports.getConfig = async (req, res, next) => {
   try {
     const rows = await prisma.systemConfig.findMany({
       where: { key: { in: CONFIG_KEYS } },
     });
     const config = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+    for (const key of SECRET_KEYS) {
+      if (config[key]) config[key] = maskSecret(config[key]);
+    }
     res.json({ success: true, data: config });
   } catch (err) { next(err); }
 };
@@ -246,15 +259,24 @@ exports.setConfig = async (req, res, next) => {
       return res.status(400).json({ success: false, error: 'Sin campos válidos' });
     }
 
-    await Promise.all(
-      allowed.map(([key, value]) =>
-        prisma.systemConfig.upsert({
-          where:  { key },
-          create: { key, value: String(value) },
-          update: { value: String(value) },
-        })
-      )
-    );
+    const toSave = allowed.filter(([key, value]) => {
+      if (SECRET_KEYS.includes(key) && typeof value === 'string' && value.startsWith(MASK_PREFIX)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (toSave.length) {
+      await Promise.all(
+        toSave.map(([key, value]) =>
+          prisma.systemConfig.upsert({
+            where:  { key },
+            create: { key, value: String(value) },
+            update: { value: String(value) },
+          })
+        )
+      );
+    }
 
     res.json({ success: true, message: 'Configuración guardada' });
   } catch (err) { next(err); }

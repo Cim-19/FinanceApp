@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { ACCOUNT_TYPES, iconEmoji } from '../../utils/accountTypes';
-import { formatCurrency } from '../../utils/formatCurrency';
+import { formatCurrency, getCurrencySymbol } from '../../utils/formatCurrency';
 import { localToday } from '../../utils/formatDate';
 
 export default function TransferModal({ open, onClose, onSave, accounts, defaultFrom }) {
@@ -141,7 +141,7 @@ export default function TransferModal({ open, onClose, onSave, accounts, default
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Monto</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">S/.</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">{getCurrencySymbol()}</span>
               <input type="number" min="0.01" step="0.01" value={form.amount}
                 onChange={(e) => set('amount', e.target.value)}
                 className={`input-base pl-10 ${insufficientFunds ? 'border-rose-400 focus:ring-rose-400' : ''}`}
