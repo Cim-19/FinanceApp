@@ -74,7 +74,7 @@ export default function TransferModal({ open, onClose, onSave, accounts, default
       <div className="relative bg-white dark:bg-gray-900 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[85svh] sm:max-h-[92vh] flex flex-col animate-slide-up">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-800 dark:text-white">💸 Transferencia</h2>
             <p className="text-xs text-gray-400 mt-0.5">Mueve dinero entre tus cuentas</p>
@@ -84,7 +84,7 @@ export default function TransferModal({ open, onClose, onSave, accounts, default
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
 
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">⚠️ {error}</div>
@@ -174,7 +174,7 @@ export default function TransferModal({ open, onClose, onSave, accounts, default
           </div>
         </form>
 
-        <div className="flex gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0">
           <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
           <button onClick={handleSubmit} disabled={loading} className="btn-primary flex-1">
             {loading
