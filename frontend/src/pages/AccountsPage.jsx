@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, RefreshCw, Wallet, PiggyBank, TrendingUp, CreditCard } from 'lucide-react';
+import { Plus, RefreshCw, Wallet, WalletCards, PiggyBank, TrendingUp, CreditCard } from 'lucide-react';
 
 import useAccounts         from '../hooks/useAccounts';
 import AccountCard         from '../components/accounts/AccountCard';
@@ -60,29 +60,34 @@ export default function AccountsPage() {
     <div className="space-y-6 animate-fade-in">
 
       {/* Header con balance total */}
-      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-700 rounded-3xl p-5 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-700 rounded-3xl p-5 sm:p-6 text-white relative overflow-hidden shadow-lg shadow-violet-600/20">
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -translate-y-16 translate-x-16" />
         <div className="absolute right-12 bottom-0 w-28 h-28 bg-white/5 rounded-full translate-y-10" />
         <div className="relative">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-purple-200 text-sm font-medium">Balance total consolidado</p>
-              <p className="text-3xl font-extrabold tracking-tight mt-0.5">{formatCurrency(totalBalance)}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 text-purple-200 text-sm font-medium">
+                <WalletCards className="w-4 h-4 flex-shrink-0" />
+                <span>Balance total consolidado</span>
+              </div>
+              <p className="text-[28px] sm:text-3xl font-extrabold tracking-tight mt-1 truncate">
+                {formatCurrency(totalBalance)}
+              </p>
             </div>
             <button onClick={openCreate}
-              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+              className="inline-flex items-center gap-2 self-start sm:self-auto flex-shrink-0 bg-white/20 hover:bg-white/30 active:scale-[0.98] backdrop-blur px-4 py-2.5 rounded-xl text-sm font-semibold transition">
               <Plus className="w-4 h-4" /> Nueva cuenta
             </button>
           </div>
           {/* Mini stats */}
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {Object.entries(ACCOUNT_TYPES).map(([type, meta]) => {
               const total = (byType[type] || []).reduce((s, a) => s + Math.round(Number(a.balance) * 100), 0) / 100;
               return (
-                <div key={type} className="bg-white/10 rounded-xl p-2.5 text-center">
-                  <p className="text-lg">{meta.emoji}</p>
-                  <p className="text-white/70 text-[10px] font-medium mt-0.5">{meta.label}</p>
-                  <p className="text-white text-xs font-bold">{formatCurrency(total)}</p>
+                <div key={type} className="bg-white/10 hover:bg-white/[0.14] transition-colors rounded-xl p-3 text-center min-w-0">
+                  <p className="text-lg leading-none">{meta.emoji}</p>
+                  <p className="text-white/70 text-[11px] font-medium mt-1.5 truncate">{meta.label}</p>
+                  <p className="text-white text-xs sm:text-sm font-bold mt-0.5 truncate">{formatCurrency(total)}</p>
                 </div>
               );
             })}
