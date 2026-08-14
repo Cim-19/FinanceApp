@@ -569,7 +569,8 @@ function NotificationsSection() {
   if (!supported) return null;
 
   return (
-    <Section title="🔔 Notificaciones push">
+    <Section icon={Bell} title="Notificaciones push" subtitle="Recordatorios y tips de ahorro"
+      gradient="from-blue-500 to-cyan-600">
       <div className="flex items-start gap-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${subscribed ? 'bg-violet-100 dark:bg-violet-900/30' : 'bg-gray-100 dark:bg-gray-800'}`}>
           {subscribed
